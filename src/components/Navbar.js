@@ -6,7 +6,8 @@ import { Menu, X } from "lucide-react"; // Icons for mobile menu
 const navRoutes = [
   { level: 1, route: "/", name: "Home" },
   { level: 2, route: "/ride-history", name: "Ride History" },
-  { level: 3, route: "/contact", name: "Contact" }
+  { level: 3, route: "/contact", name: "Contact" },
+  { level: 4, route: "/login", name: "Login" }
 ];
 
 function Navbar() {
