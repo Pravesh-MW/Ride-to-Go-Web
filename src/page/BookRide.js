@@ -68,15 +68,19 @@ function BookRide() {
   const generateTimeSlots = () => {
     const slots = [];
     const now = new Date();
-    now.setMinutes(Math.ceil(now.getMinutes() / 30) * 30, 0, 0);
-    const maxTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
+    now.setMinutes(Math.ceil(now.getMinutes() / 30) * 30, 0, 0); // Round up to the nearest 30 minutes
+    const maxTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours from now
+    const todayEnd = new Date(now); // Create a copy of `now`
+    todayEnd.setHours(23, 59, 59, 999); // Set to the end of today (23:59:59.999)
+  
     while (now <= maxTime) {
       const startTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-      now.setMinutes(now.getMinutes() + 30);
+      const isToday = now <= todayEnd; // Check if the slot is today or tomorrow
+      now.setMinutes(now.getMinutes() + 30); // Increment by 30 minutes
       const endTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-      slots.push(`${startTime} - ${endTime}`);
+      slots.push(`${startTime} - ${endTime} - ${isToday ? "Today" : "Tomorrow"}`);
     }
+  
     return slots;
   };
 
@@ -162,21 +166,7 @@ function BookRide() {
 
 
             <div className="mb-4 flex space-x-3">
-              <div className="w-1/2">
-                <label className="block text-gray-700 font-semibold mb-2">Date</label>
-                <div className="flex items-center border border-gray-300 p-3 rounded-lg">
-                  <Calendar className="text-gray-500 mr-2" size={18} />
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={handleDateChange}
-                    className="w-full focus:ring-0 focus:outline-none"
-                    min={new Date().toISOString().split("T")[0]}
-                    max={new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
-                  />
-                </div>
-              </div>
-              <div className="w-1/2">
+              <div className="">
                 <label className="block text-gray-700 font-semibold mb-2">Time</label>
                 <div className="flex items-center border border-gray-300 p-3 rounded-lg">
                   <Clock className="text-gray-500 mr-2" size={18} />
