@@ -115,10 +115,37 @@ function RideHistory() {
                 </div>
 
                 {isLargeScreen ? (
+                    <div className="">
+                    <div className="mt-4 flex items-center space-x-4">
+                    <div className="flex-1 text-center">
+                      <p className="text-gray-500 text-sm">Pickup</p>
+                      <div className="flex items-center justify-center text-blue-600 font-bold text-lg">
+                        <MapPin className="mr-2" size={20} />
+                        {ride.pickup}
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">
+                        <Clock size={14} className="mr-1 inline" /> {ride.pickupTime}
+                      </p>
+                    </div>
+
+                    <div className="flex-1 border-dashed border-t-2 border-gray-400"></div>
+
+                    <div className="flex-1 text-center">
+                      <p className="text-gray-500 text-sm">Drop-off</p>
+                      <div className="flex items-center justify-center text-purple-600 font-bold text-lg">
+                        <MapPin className="mr-2" size={20} />
+                        {ride.dropoff}
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">
+                        <Clock size={14} className="mr-1 inline" /> {ride.dropoffTime}
+                      </p>
+                    </div>
+                  </div>
                   <div className="mt-4 flex justify-between text-gray-600 text-sm">
                     <p><strong>Distance:</strong> {ride.distance}</p>
                     <p><strong>Duration:</strong> {ride.duration}</p>
                     <p><strong>Payment:</strong> {ride.paymentMethod}</p>
+                  </div>
                   </div>
                 ) : (
                   <>
