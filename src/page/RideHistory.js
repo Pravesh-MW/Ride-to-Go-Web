@@ -344,11 +344,19 @@ const RideHistory1 = () => {
             </p>
           </div>
         </div>
-        <div className="mt-4 flex justify-between text-gray-600 text-sm">
-          <p><strong>Distance:</strong> {ride?.distance}</p>
-          <p><strong>Duration:</strong> {ride?.duration}</p>
-          <p><strong>Payment:</strong> {ride?.paymentMethod}</p>
-        </div>
+        { ride.status !== 'Completed' 
+          ?
+          (<div className="mt-4 flex justify-between text-gray-600 text-sm">
+            <p><strong>Estimated Distance:</strong> {ride?.estimatedDistance} {ride?.distanceUnit}</p>
+            <p><strong>Estimated Duration:</strong> {ride?.estimatedTime}</p>
+            <p><strong>Payment:</strong> {ride?.paymentMethod}</p>
+          </div>)
+          :(<div className="mt-4 flex justify-between text-gray-600 text-sm">
+            <p><strong>Distance:</strong> {ride?.totalDistance} {ride?.distanceUnit}</p>
+            <p><strong>Duration:</strong> {ride?.totalDuration}</p>
+            <p><strong>Payment:</strong> {ride?.paymentMethod}</p>
+          </div>)
+        }
       </div>
     ) : (
       <>
