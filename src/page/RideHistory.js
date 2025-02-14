@@ -269,6 +269,7 @@ const RideHistory1 = () => {
           }),
         }));
 
+        console.log(formattedData);
         setRideHistory(formattedData);
       } catch (error) {
         console.error("Error fetching ride history:", error);
@@ -279,9 +280,25 @@ const RideHistory1 = () => {
   }, []);
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-bold mb-4">Ride History</h2>
+    <div className="min-h-screen bg-gray-100 flex flex-col">
+      <div className="flex-grow flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-8">
+        <div className="text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Your Ride History</h1>
+          <p className="text-lg md:text-xl mb-6">View your past rides and track your expenses.</p>
+          <Link
+            to="/book-ride"
+            className="bg-white text-blue-600 font-semibold py-3 px-6 md:px-8 rounded-full shadow-lg hover:bg-gray-100 transition duration-300"
+          >
+            Book a New Ride
+          </Link>
+        </div>
+      </div>
 
+      <div className="flex justify-center mt-10 px-4">
+        <div className="w-full max-w-4xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 text-center">Recent Rides</h2>
+
+          <div className="space-y-6">
       {rideHistory.length > 0 ? rideHistory.map((ride) => (
   <div key={ride?.id} className="relative bg-white rounded-xl shadow-lg p-6 border border-gray-200 overflow-hidden">
     <div className="absolute top-1/2 left-0 w-6 h-6 bg-gray-100 rounded-full transform -translate-y-1/2 -translate-x-1/2 border border-gray-400"></div>
@@ -418,6 +435,9 @@ const RideHistory1 = () => {
 </div>
 
       )}
+      </div>
+    </div>
+  </div>
     </div>
   );
 };

@@ -1,120 +1,113 @@
 import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { FaUser, FaUserCircle, FaBell, FaCog, FaWallet } from "react-icons/fa"; // Import icons
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { setActiveTab, setAbout, setStatus, setWalletBalance, setSettings } from "../reducers/profileSlice";
+import Wallet from "../components/profile/Wallet";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import About from "../components/profile/ProfileInfo";
+import Settings from "../components/profile/Settings";
+import ProfileInfo from "../components/profile/ProfileInfo";
+import Notifications from "../components/profile/Notifications";
 
 const Profile = () => {
-  const [activeTab, setActiveTab] = useState("about");
-  const [about, setAbout] = useState("");
-  const [status, setStatus] = useState("");
-  const [walletBalance, setWalletBalance] = useState(0);
-  const [settings, setSettings] = useState({});
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/profile/${activeTab}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-
-        switch (activeTab) {
-          case "about":
-            setAbout(response.data.bio);
-            break;
-          case "status":
-            setStatus(response.data.status);
-            break;
-          case "wallet":
-            setWalletBalance(response.data.balance);
-            break;
-          case "settings":
-            setSettings(response.data.settings);
-            break;
-          default:
-            break;
-        }
-      } catch (error) {
-        console.error(`Error fetching ${activeTab} data:`, error);
-        alert(`Failed to fetch ${activeTab} data. Please try again.`);
-        navigate("/login"); // Redirect to login if unauthorized
-      }
-    };
-
-    fetchData();
-  }, [activeTab, navigate]);
+  const dispatch = useDispatch();
+  const { activeTab, about, status, walletBalance, settings } = useSelector(
+    (state) => state.profile
+  );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
-      {/* Sidebar */}
-      <div className="bg-white w-64 p-4 shadow-lg">
-        <h2 className="text-xl font-bold mb-6">Profile</h2>
-        <nav className="space-y-2">
-          <NavLink
-            to="#"
-            onClick={() => setActiveTab("about")}
-            className={`block p-2 rounded-lg ${
-              activeTab === "about"
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            About
-          </NavLink>
-          <NavLink
-            to="#"
-            onClick={() => setActiveTab("status")}
-            className={`block p-2 rounded-lg ${
-              activeTab === "status"
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Status
-          </NavLink>
-          <NavLink
-            to="#"
-            onClick={() => setActiveTab("wallet")}
-            className={`block p-2 rounded-lg ${
-              activeTab === "wallet"
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Wallet
-          </NavLink>
-          <NavLink
-            to="#"
-            onClick={() => setActiveTab("settings")}
-            className={`block p-2 rounded-lg ${
-              activeTab === "settings"
-                ? "bg-blue-600 text-white"
-                : "text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            Settings
-          </NavLink>
-        </nav>
-      </div>
+    <>
+      {/* Navbar at the top */}
+      <Navbar />
 
-      {/* Main Content */}
-      <div className="flex-grow p-8">
-        <h2 className="text-2xl font-bold mb-6 capitalize">{activeTab}</h2>
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-          {activeTab === "about" && <p>{about}</p>}
-          {activeTab === "status" && <p>Status: {status}</p>}
-          {activeTab === "wallet" && <p>Wallet Balance: ${walletBalance}</p>}
-          {activeTab === "settings" && (
-            <pre>{JSON.stringify(settings, null, 2)}</pre>
-          )}
+      {/* Main content area */}
+      <div className="min-h-screen bg-gray-100 flex flex-col">
+        <div className="flex flex-grow">
+          {/* Sidebar */}
+          <div className="bg-white w-64 p-4 shadow-lg">
+            {/* User Info Section */}
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                <FaUserCircle className="text-gray-600 text-2xl" /> {/* User avatar icon */}
+              </div>
+              <div>
+                <p className="font-semibold text-gray-800">User Name</p>
+                <p className="text-gray-500 text-sm">user@example.com</p>
+              </div>
+            </div>
+
+            {/* Navigation Links */}
+            <nav className="space-y-2">
+              <NavLink
+                to="#"
+                onClick={() => dispatch(setActiveTab("about"))}
+                className={`flex items-center p-2 rounded-lg ${
+                  activeTab === "about"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <FaUser className="mr-2" /> {/* Icon */}
+                My Profile
+              </NavLink>
+              <NavLink
+                to="#"
+                onClick={() => dispatch(setActiveTab("wallet"))}
+                className={`flex items-center p-2 rounded-lg ${
+                  activeTab === "wallet"
+                  ? "bg-blue-600 text-white"
+                    : "text-gray-700 hover:bg-gray-200"
+                  }`}
+              >
+                <FaWallet className="mr-2" /> {/* Icon */}
+                Wallet
+              </NavLink>
+              <NavLink
+                to="#"
+                onClick={() => dispatch(setActiveTab("notifications"))}
+                className={`flex items-center p-2 rounded-lg ${
+                  activeTab === "notifications"
+                  ? "bg-blue-600 text-white"
+                  : "text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <FaBell className="mr-2" /> {/* Icon */}
+                Notifications
+              </NavLink>
+              <NavLink
+                to="#"
+                onClick={() => dispatch(setActiveTab("settings"))}
+                className={`flex items-center p-2 rounded-lg ${
+                  activeTab === "settings"
+                    ? "bg-blue-600 text-white"
+                    : "text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                <FaCog className="mr-2" /> {/* Icon */}
+                Settings
+              </NavLink>
+            </nav>
+          </div>
+
+          {/* Main Content */}
+          <div className="flex-grow p-8">
+              {activeTab === "about" && <ProfileInfo/>}
+              {activeTab === "wallet" && <Wallet />}
+              {activeTab === "notifications" && <Notifications />}
+              {activeTab === "settings" && <Settings settings={settings} setSettings={setSettings} />}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Footer at the bottom */}
+      <Footer />
+    </>
   );
 };
 
 export default Profile;
+

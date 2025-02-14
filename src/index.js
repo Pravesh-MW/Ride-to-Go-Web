@@ -10,24 +10,37 @@ import Contact from "./page/Contact";
 import Login from "./Auth/Login";
 import Register from "./Auth/Register";
 import Profile from "./page/Profile";
+import { ProfileProvider } from "./context/ProfileContext";
+
+import { Provider } from "react-redux";
+import store from "./reducers/store";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/book-ride" caseSensitive={false} element={<BookRide />} />
-        <Route
-          path="/ride-history"
-          caseSensitive={false}
-          element={<RideHistory />}
-        />
-        <Route path="/contact" caseSensitive={false} element={<Contact />} />
-        <Route path="/login" caseSensitive={false} element={<Login />} />
-        <Route path="/register" caseSensitive={false} element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
-      </Routes>
-    </BrowserRouter>
-  </React.StrictMode>
+    <React.StrictMode>
+      <Provider store={store}>
+        <BrowserRouter>
+  
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/book-ride" element={<BookRide />} />
+            <Route path="/ride-history" element={<RideHistory />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+  
+            {/* Wrap Profile in ProfileProvider */}
+            <Route
+              path="/profile"
+              element={
+                <ProfileProvider>
+                  <Profile />
+                </ProfileProvider>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </Provider>
+    </React.StrictMode>
+  
 );
