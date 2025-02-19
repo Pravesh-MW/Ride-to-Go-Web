@@ -14,33 +14,42 @@ import { ProfileProvider } from "./context/ProfileContext";
 
 import { Provider } from "react-redux";
 import store from "./reducers/store";
+import { LoadScript } from "@react-google-maps/api";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <React.StrictMode>
-      <Provider store={store}>
-        <BrowserRouter>
-  
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/book-ride" element={<BookRide />} />
-            <Route path="/ride-history" element={<RideHistory />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-  
-            {/* Wrap Profile in ProfileProvider */}
-            <Route
-              path="/profile"
-              element={
-                <ProfileProvider>
-                  <Profile />
-                </ProfileProvider>
-              }
-            />
-          </Routes>
-        </BrowserRouter>
-      </Provider>
-    </React.StrictMode>
-  
+  <React.StrictMode>
+    <Provider store={store}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route
+            path="/book-ride"
+            element={
+              <LoadScript
+                googleMapsApiKey="AIzaSyAOVYRIgupAurZup5y1PRh8Ismb1A3lLao"
+                libraries={["places"]}
+              >
+                <BookRide />
+              </LoadScript>
+            }
+          />
+          <Route path="/ride-history" element={<RideHistory />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Wrap Profile in ProfileProvider */}
+          <Route
+            path="/profile"
+            element={
+              <ProfileProvider>
+                <Profile />
+              </ProfileProvider>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </Provider>
+  </React.StrictMode>
 );

@@ -2,23 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 import { Calendar, Clock, CreditCard } from "lucide-react";
+import MyMapComponent from "../components/MyMapComponent";
 
 function LocationPicker({ onSelect, onClose }) {
-  const [position, setPosition] = useState(null);
-
-  const MapClickHandler = () => {
-    useMapEvents({
-      click(e) {
-        setPosition(e.latlng);
-      },
-    });
-    return position ? <Marker position={position} /> : null;
-  };
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-lg relative">
@@ -31,20 +20,10 @@ function LocationPicker({ onSelect, onClose }) {
         <h2 className="text-lg font-semibold text-gray-700 mb-3">
           Select Location
         </h2>
-        <MapContainer
-          center={[51.505, -0.09]}
-          zoom={13}
-          style={{ height: "300px", width: "100%" }}
-        >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <MapClickHandler />
-        </MapContainer>
+        <MyMapComponent setPlace={onSelect} />
         <button
           onClick={() => {
-            if (position) {
-              onSelect(position);
-              onClose();
-            }
+            onClose();
           }}
           className="mt-3 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
         >
@@ -55,10 +34,11 @@ function LocationPicker({ onSelect, onClose }) {
   );
 }
 
-
 const BookRide = () => {
   const [pickupLocation, setPickupLocation] = useState("");
+  const [pickupLocationCordinate, setPickupLocationCordinate] = useState("");
   const [dropoffLocation, setDropoffLocation] = useState("");
+  const [dropoffLocationCordinate, setDropoffLocationCordinate] = useState("");
   const [showPickupMap, setShowPickupMap] = useState(false);
   const [showDropoffMap, setShowDropoffMap] = useState(false);
   const [selectedTime, setSelectedTime] = useState({});
@@ -75,17 +55,25 @@ const BookRide = () => {
     endOfToday.setHours(23, 59, 59, 999); // Set to the end of today (23:59:59.999)
 
     while (now <= maxTime) {
-      const startTime = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+      const startTime = now.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
       const isToday = now <= endOfToday; // Check if the slot is today or tomorrow
       now.setMinutes(now.getMinutes() + 30); // Increment by 30 minutes
-      const endTime = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
+      const endTime = now.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
       slots.push({
         label: `${startTime} - ${endTime} - ${isToday ? "Today" : "Tomorrow"}`,
-        value : {
+        value: {
           startTime: startTime,
           endTime: endTime,
-          isToday: isToday
-        }
+          isToday: isToday,
+        },
       });
     }
 
@@ -94,11 +82,11 @@ const BookRide = () => {
 
   const timeSlots = generateTimeSlots();
 
-  useEffect(() =>{
-    if(timeSlots){
+  useEffect(() => {
+    if (timeSlots) {
       setSelectedTime(timeSlots[0].value);
     }
-  },[])
+  }, []);
   // Handle form submission
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -106,6 +94,8 @@ const BookRide = () => {
     const rideDetails = {
       pickupLocation,
       dropoffLocation,
+      pickupLocationCordinate,
+      dropoffLocationCordinate,
       selectedTime,
       selectedRideType,
       selectedPaymentMethod,
@@ -126,7 +116,7 @@ const BookRide = () => {
       });
 
       console.log(`Bearer ${userToken}`);
-      
+
       const result = await response.json();
       if (response.ok) {
         alert("Ride booked successfully!");
@@ -146,13 +136,17 @@ const BookRide = () => {
 
       <div className="flex-grow flex flex-col items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 text-white p-8">
         <h1 className="text-5xl font-bold mb-4">Book a Ride</h1>
-        <p className="text-xl mb-6">Get to your destination safely and quickly.</p>
+        <p className="text-xl mb-6">
+          Get to your destination safely and quickly.
+        </p>
 
         <div className="bg-white p-6 rounded-lg shadow-lg text-gray-800 w-full max-w-md">
           <form onSubmit={handleFormSubmit}>
             {/* Pickup Location */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Pickup Location</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Pickup Location
+              </label>
               <div className="flex">
                 <input
                   type="text"
@@ -173,7 +167,9 @@ const BookRide = () => {
 
             {/* Drop-off Location */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Drop-off Location</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Drop-off Location
+              </label>
               <div className="flex">
                 <input
                   type="text"
@@ -192,51 +188,37 @@ const BookRide = () => {
               </div>
             </div>
 
-            {/* Time Slot Selection */}
-            {/* <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Time</label>
+            <div className="mb-4">
+              <label
+                htmlFor="time-select"
+                className="block text-gray-700 font-semibold mb-2"
+              >
+                Time
+              </label>
               <div className="flex items-center border border-gray-300 p-3 rounded-lg">
                 <Clock className="text-gray-500 mr-2" size={18} />
                 <select
-                  value={selectedTime}
-                  onChange={(e) => setSelectedTime(e.target.value)}
-                  className="w-full focus:ring-0 focus:outline-none"
+                  id="time-select"
+                  value={JSON.stringify(selectedTime)} // Convert object to string for controlled select
+                  onChange={(e) => setSelectedTime(JSON.parse(e.target.value))} // Parse string back to object
+                  className="w-full focus:ring-0 focus:outline-none bg-transparent"
                 >
                   {timeSlots.map((slot, index) => (
-                    <option key={index} value={slot.value}>
+                    <option key={index} value={JSON.stringify(slot.value)}>
+                      {" "}
+                      {/* Store object as string */}
                       {slot.label}
                     </option>
                   ))}
                 </select>
               </div>
-            </div> */}
-
-<div className="mb-4">
-  <label htmlFor="time-select" className="block text-gray-700 font-semibold mb-2">
-    Time
-  </label>
-  <div className="flex items-center border border-gray-300 p-3 rounded-lg">
-    <Clock className="text-gray-500 mr-2" size={18} />
-    <select
-      id="time-select"
-      value={JSON.stringify(selectedTime)} // Convert object to string for controlled select
-      onChange={(e) => setSelectedTime(JSON.parse(e.target.value))} // Parse string back to object
-      className="w-full focus:ring-0 focus:outline-none bg-transparent"
-    >
-      {timeSlots.map((slot, index) => (
-        <option key={index} value={JSON.stringify(slot.value)}> {/* Store object as string */}
-          {slot.label}
-        </option>
-      ))}
-    </select>
-  </div>
-</div>
-
-
+            </div>
 
             {/* Ride Type Selection */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Ride Type</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Ride Type
+              </label>
               <select
                 value={selectedRideType}
                 onChange={(e) => setSelectedRideType(e.target.value)}
@@ -250,7 +232,9 @@ const BookRide = () => {
 
             {/* Payment Method Selection */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Payment Method</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Payment Method
+              </label>
               <div className="flex items-center border border-gray-300 p-3 rounded-lg">
                 <CreditCard className="text-green-500 mr-2" size={18} />
                 <select
@@ -283,14 +267,20 @@ const BookRide = () => {
       {/* Location Pickers */}
       {showPickupMap && (
         <LocationPicker
-          onSelect={(position) => setPickupLocation(`Lat: ${position.lat}, Lng: ${position.lng}`)}
+          onSelect={(place, location) => {
+            setPickupLocation(place);
+            setPickupLocationCordinate(location);
+          }}
           onClose={() => setShowPickupMap(false)}
         />
       )}
 
       {showDropoffMap && (
         <LocationPicker
-          onSelect={(position) => setDropoffLocation(`Lat: ${position.lat}, Lng: ${position.lng}`)}
+          onSelect={(place, location) => {
+            setDropoffLocation(place);
+            setDropoffLocationCordinate(location);
+          }}
           onClose={() => setShowDropoffMap(false)}
         />
       )}
